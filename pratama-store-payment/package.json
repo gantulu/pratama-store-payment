@@ -1,0 +1,16 @@
+{
+  "name": "pratama-store-payment",
+  "version": "1.0.0",
+  "description": "Duitku integration demo (sandbox) - ready to deploy to Railway",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "axios": "^1.5.0",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.2"
+  }
+}
