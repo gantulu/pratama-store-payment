@@ -1,80 +1,35 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Checkout - Pratama Store</title>
-  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center p-6">
-  <div class="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8">
-    <h1 class="text-2xl font-semibold mb-4">Checkout — Pratama Store</h1>
-    <p class="text-sm text-gray-600 mb-6">Integrasi Duitku (sandbox). Isi data di bawah lalu klik <strong>Bayar Sekarang</strong>.</p>
+<body>
+  <h1>Checkout Pratama Store</h1>
+  <form id="checkoutForm">
+    <input type="text" name="orderId" placeholder="Order ID" required><br>
+    <input type="number" name="amount" placeholder="Jumlah (contoh: 100000)" required><br>
+    <input type="text" name="customerName" placeholder="Nama Pelanggan" required><br>
+    <input type="email" name="email" placeholder="Email" required><br>
+    <button type="submit">Buat Transaksi</button>
+  </form>
 
-    <form id="paymentForm" class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Order ID</label>
-        <input id="orderId" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="contoh: INV-20251025-001" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Jumlah (IDR)</label>
-        <input id="amount" type="number" min="1" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="10000" />
-      </div>
-
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Nama</label>
-          <input id="customerName" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="Nama pelanggan" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Email</label>
-          <input id="email" type="email" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="email@contoh.com" />
-        </div>
-      </div>
-
-      <div class="flex items-center justify-between">
-        <button type="submit" class="px-5 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700">Bayar Sekarang</button>
-        <small class="text-gray-500">Mode: <strong>Sandbox</strong></small>
-      </div>
-    </form>
-
-    <div id="result" class="mt-6"></div>
-  </div>
+  <pre id="result"></pre>
 
   <script>
-    const form = document.getElementById('paymentForm');
-    const resultEl = document.getElementById('result');
-
-    form.addEventListener('submit', async (e) => {
+    document.getElementById("checkoutForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      resultEl.innerHTML = "";
-
-      const payload = {
-        orderId: document.getElementById('orderId').value.trim(),
-        amount: Number(document.getElementById('amount').value),
-        customerName: document.getElementById('customerName').value.trim(),
-        email: document.getElementById('email').value.trim(),
-      };
-
-      try {
-        const res = await fetch('/api/create-transaction', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-        if (data.paymentUrl) {
-          // Redirect to payment page
-          window.location.href = data.paymentUrl;
-          return;
-        }
-
-        // show raw response for debugging in sandbox
-        resultEl.innerHTML = '<pre class="bg-gray-100 p-3 rounded">'+JSON.stringify(data, null, 2)+'</pre>';
-      } catch (err) {
-        resultEl.innerHTML = '<div class="text-red-600">Gagal membuat transaksi: '+err.message+'</div>';
+      const data = Object.fromEntries(new FormData(e.target));
+      const res = await fetch("/api/create-transaction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const json = await res.json();
+      document.getElementById("result").textContent = JSON.stringify(json, null, 2);
+      if (json.paymentUrl) {
+        window.location.href = json.paymentUrl;
       }
     });
   </script>
